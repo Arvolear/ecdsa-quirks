@@ -1,0 +1,68 @@
+{
+  "name": "ecdsa-quirks",
+  "description": "Generate the same ECDSA signature for two different messages",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "bin": {
+    "ecdsa-quirks": "dist/src/index.js"
+  },
+  "exports": {
+    ".": "./dist/src/index.js"
+  },
+  "files": [
+    "dist/src/",
+    "src/",
+    "LICENSE",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arvolear/ecdsa-quirks.git"
+  },
+  "keywords": [
+    "ecdsa",
+    "quirks",
+    "ethereum"
+  ],
+  "author": "Artem Chystiakov",
+  "license": "MIT",
+  "bugs": {
+    "url": "git+https://github.com/arvolear/ecdsa-quirks.gitissues"
+  },
+  "homepage": "git+https://github.com/arvolear/ecdsa-quirks.git#readme",
+  "scripts": {
+    "prepare": "husky",
+    "prepack": "npm run build",
+    "build": "tsc --build .",
+    "lint": "prettier --check . && node --import tsx/esm ./node_modules/eslint/bin/eslint.js .",
+    "test": "node --import ./tests/loader-bootstrap.mjs --no-deprecation ./node_modules/mocha/bin/mocha.js \"tests/**/*.test.ts\" -t 120000",
+    "lint-fix": "prettier --write . && node --import tsx/esm ./node_modules/eslint/bin/eslint.js . --fix",
+    "publish": "npm run build && npm publish --access public"
+  },
+  "dependencies": {
+    "@noble/curves": "2.0.1",
+    "bigint-mod-arith": "3.3.1",
+    "chai": "6.2.0",
+    "commander": "14.0.1",
+    "ethers": "6.16.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.9.1",
+    "eslint": "^9.13.0",
+    "eslint-plugin-n": "^17.10.3",
+    "globals": "^15.11.0",
+    "husky": "^9.1.7",
+    "jiti": "^2.0.0",
+    "mocha": "^11.7.4",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.12.2"
+  }
+}
