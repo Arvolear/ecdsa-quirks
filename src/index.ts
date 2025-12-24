@@ -67,7 +67,7 @@ function quirk(message1: string, message2: string, eip191: boolean): Quirked {
   };
 }
 
-function printQuired(message1: string, message2: string, quirked: Quirked) {
+function printQuirked(message1: string, message2: string, quirked: Quirked) {
   console.log("Private key: " + quirked.privateKey);
   console.log("Address: " + quirked.address);
 
@@ -92,19 +92,25 @@ async function main(): Promise<void> {
     .option("--eip191", "Whether to EIP-191 hash the messages before signing", false)
     .showHelpAfterError();
 
-  const parsed = await program.parseAsync(process.argv);
-  const opts = parsed.opts<{
-    message1: string;
-    message2: string;
-    eip191: boolean;
-  }>();
+  try {
+    const parsed = await program.parseAsync(process.argv);
+    const opts = parsed.opts<{
+      message1: string;
+      message2: string;
+      eip191: boolean;
+    }>();
 
-  if (!opts.message1 || !opts.message2) {
-    throw new Error("Specify both messages to generate the signature for");
+    if (!opts.message1 || !opts.message2) {
+      throw new Error("Specify both messages to generate the signature for");
+    }
+
+    const quirked = quirk(opts.message1, opts.message2, opts.eip191);
+    printQuirked(opts.message1, opts.message2, quirked);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+
+    throw new Error(msg);
   }
-
-  const quirked = quirk(opts.message1, opts.message2, opts.eip191);
-  printQuired(opts.message1, opts.message2, quirked);
 }
 
 void main();
