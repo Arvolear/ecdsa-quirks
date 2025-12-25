@@ -18,13 +18,16 @@ type Quirked = {
 
 // based on https://www.di.ens.fr/david.pointcheval/Documents/Papers/2002_cryptoA.pdf
 function quirk(message1: string, message2: string, eip191: boolean): Quirked {
+  let message1Hash;
+  let message2Hash;
+
   // EIP-191 hash
   if (eip191) {
-    message1 = ethers.hashMessage(message1);
-    message2 = ethers.hashMessage(message2);
+    message1Hash = ethers.hashMessage(message1);
+    message2Hash = ethers.hashMessage(message2);
   } else {
-    message1 = ethers.hexlify(ethers.toUtf8Bytes(message1));
-    message2 = ethers.hexlify(ethers.toUtf8Bytes(message2));
+    message1Hash = ethers.keccak256(ethers.toUtf8Bytes(message1));
+    message2Hash = ethers.keccak256(ethers.toUtf8Bytes(message2));
   }
 
   const n = secp256k1.Point.CURVE().n;
@@ -32,12 +35,13 @@ function quirk(message1: string, message2: string, eip191: boolean): Quirked {
   const r = "0x" + ethers.hexlify(secp256k1.getPublicKey(Buffer.from(k.slice(2), "hex"))).slice(4); // take x coordinate
 
   // x = -((h1 + h2) / 2r) (mod n)
-  const numer = BigInt(message1) + BigInt(message2);
+  const numer = BigInt(message1Hash) + BigInt(message2Hash);
   const denom = BigInt(modInv(2n * BigInt(r), BigInt(n)));
   const x = BigInt(n) - ((numer * denom) % BigInt(n));
 
   // regular ECDSA signature
-  let s = (BigInt(modInv(BigInt(k), BigInt(n))) * (BigInt(message1) + x * BigInt(r))) % BigInt(n);
+  let s =
+    (BigInt(modInv(BigInt(k), BigInt(n))) * (BigInt(message1Hash) + x * BigInt(r))) % BigInt(n);
 
   // make s be from the lower part of the curve
   if (s > n / 2n) {
@@ -49,15 +53,15 @@ function quirk(message1: string, message2: string, eip191: boolean): Quirked {
   let sig1 = ethers.toBeHex(r, 32) + ethers.toBeHex(s, 32).slice(2) + "1b";
   let sig2 = ethers.toBeHex(r, 32) + ethers.toBeHex(s, 32).slice(2) + "1c";
 
-  if (ethers.verifyMessage(message1, sig1) != wallet.address) {
+  if (ethers.recoverAddress(message1Hash, sig1) != wallet.address) {
     const tmp = sig1;
     sig1 = sig2;
     sig2 = tmp;
   }
 
   // sanity check
-  expect(ethers.verifyMessage(message1, sig1) == wallet.address);
-  expect(ethers.verifyMessage(message2, sig2) == wallet.address);
+  expect(ethers.recoverAddress(message1Hash, sig1)).to.eq(wallet.address);
+  expect(ethers.recoverAddress(message2Hash, sig2)).to.eq(wallet.address);
 
   return {
     privateKey: ethers.toBeHex(x, 32),
