@@ -16,8 +16,8 @@ To generate the signatures, run:
 ecdsa-quirks --m1 "<some message>" --m2 "<some other message>" [--eip191]
 ```
 
-The tool will log the private key and generated signatures via that private key.
+The tool will log the private key and generated signatures via that private key that are the same for the specified messages.
 
 ## Disclaimer
 
-The tool is based on [this research paper](https://www.di.ens.fr/david.pointcheval/Documents/Papers/2002_cryptoA.pdf). Please check it out to understand the math behind.
+The implementation is based on [this research paper](https://www.di.ens.fr/david.pointcheval/Documents/Papers/2002_cryptoA.pdf). Please check it out to understand the math behind.
