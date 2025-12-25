@@ -39,7 +39,7 @@
     "lint": "prettier --check . && node --import tsx/esm ./node_modules/eslint/bin/eslint.js .",
     "test": "node --import ./tests/loader-bootstrap.mjs --no-deprecation ./node_modules/mocha/bin/mocha.js \"tests/**/*.test.ts\" -t 120000",
     "lint-fix": "prettier --write . && node --import tsx/esm ./node_modules/eslint/bin/eslint.js . --fix",
-    "publish": "npm run build && npm publish --access public"
+    "publish-to-npm": "npm run build && npm publish --access public"
   },
   "dependencies": {
     "@noble/curves": "2.0.1",
